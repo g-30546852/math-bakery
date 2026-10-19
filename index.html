@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🍰 Bakery Math Adventure: Misi Kek Impian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #FFF8EE;
+      --card-bg: #FFFFFF;
+      --choco-dark: #4A2E1B;
+      --choco-light: #7E4A28;
+      --pink-primary: #FF7597;
+      --pink-soft: #FFDEE9;
+      --mint-primary: #48C78E;
+      --mint-soft: #D7F6E7;
+      --butter-yellow: #FFDF6D;
+      --accent-blue: #4EA8DE;
+      --border-rad: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #FFE6AF 0%, #FFD6E0 50%, #C9F0FF 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--choco-dark);
+      padding: 12px;
+    }
+
+    h1, h2, h3, .brand-font {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+
+    #game-app {
+      width: 100%;
+      max-width: 940px;
+      min-height: 640px;
+      background: var(--bg-cream);
+      border: 4px solid var(--choco-dark);
+      border-radius: var(--border-rad);
+      box-shadow: 0 14px 0 #5E3920, 0 20px 30px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.hud-bar {
+      background: #FFFFFF;
+      border-bottom: 3px solid #EAD8C7;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+
+    .player-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chef-avatar {
+      font-size: 26px;
+      background: var(--pink-soft);
+      border: 2px solid var(--choco-dark);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .player-text .p-name {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--choco-dark);
+    }
+    .player-text .p-grade {
+      font-size: 0.8rem;
+      color: #9C6644;
+      font-weight: 700;
+    }
+
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-badge {
+      background: #FFF;
+      border: 2px solid var(--choco-dark);
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 3px 0 var(--choco-dark);
+    }
+    .stat-badge.wallet { color: #2B9348; }
+    .stat-badge.score { color: #E85D04; }
+
+    .progress-box {
+      width: 100%;
+      height: 8px;
+      background: #E8D5C4;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+      border: 1px solid var(--choco-dark);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--mint-primary), #20BF55);
+      transition: width 0.3s ease;
+    }
+
+    main.stage-viewport {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-3d {
+      border: 3px solid var(--choco-dark);
+      border-radius: 14px;
+      padding: 10px 20px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-transform: uppercase;
+      background: var(--pink-primary);
+      color: #FFF;
+      box-shadow: 0 5px 0 var(--choco-dark);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 var(--choco-dark);
+    }
+    .btn-3d.btn-mint { background: var(--mint-primary); }
+    .btn-3d.btn-yellow { background: var(--butter-yellow); color: var(--choco-dark); }
+    .btn-3d.btn-blue { background: var(--accent-blue); }
+    .btn-3d.btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      box-shadow: 0 3px 0 var(--choco-dark);
+      border-radius: 10px;
+    }
+    .btn-3d:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 3px 0 var(--choco-dark);
+    }
+
+    /* Form */
+    .welcome-card {
+      background: #FFFFFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: var(--border-rad);
+      box-shadow: 0 8px 0 #DEC0A4;
+      padding: 24px;
+      max-width: 540px;
+      margin: auto;
+      text-align: center;
+    }
+    .hero-banner {
+      font-size: 50px;
+      margin-bottom: 6px;
+    }
+    .form-group {
+      text-align: left;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 800;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+    .input-3d {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--choco-dark);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: #FFFDF9;
+      outline: none;
+    }
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .grade-btn {
+      border: 2px solid var(--choco-dark);
+      border-radius: 10px;
+      padding: 8px;
+      background: #FFF;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 3px 0 var(--choco-dark);
+    }
+    .grade-btn.active {
+      background: var(--butter-yellow);
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--choco-dark);
+    }
+
+    /* Dialogue */
+    .dialogue-scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 650px;
+      margin: auto;
+    }
+    .customer-avatar { font-size: 65px; }
+    .bubble-card {
+      background: #FFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 18px;
+      padding: 14px 18px;
+      box-shadow: 0 6px 0 #E3C8B0;
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .recipe-manifest {
+      background: #FFF9F2;
+      border: 2px dashed var(--choco-dark);
+      border-radius: 14px;
+      padding: 14px;
+      width: 100%;
+      text-align: left;
+    }
+    .recipe-list-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dotted #DDB892;
+      font-weight: 700;
+    }
+
+    /* Shop */
+    .shop-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 14px;
+      height: 100%;
+    }
+    .items-shelf {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .shop-item-card {
+      background: #FFFFFF;
+      border: 2px solid var(--choco-dark);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 4px 0 #E6D2BF;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .item-icon-wrap {
+      font-size: 38px;
+      background: var(--bg-cream);
+      border-radius: 10px;
+      padding: 6px;
+      margin-bottom: 6px;
+    }
+    .cart-summary {
+      background: #FFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 6px 0 #DFBEA3;
+    }
+    .cart-items-box {
+      flex: 1;
+      overflow-y: auto;
+      max-height: 250px;
+      margin: 8px 0;
+      border-top: 2px dashed #E0C3A9;
+      border-bottom: 2px dashed #E0C3A9;
+      padding: 6px 0;
+    }
+
+    /* Weighing Station */
+    .weigh-station {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .recipe-board {
+      background: #FFFDF9;
+      border: 3px solid var(--choco-dark);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 5px 0 #DFBEA3;
+    }
+    .ingredient-sel-btn {
+      width: 100%;
+      text-align: left;
+      padding: 8px 12px;
+      border: 2px solid var(--choco-dark);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      background: #FFF;
+      font-weight: 800;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .ingredient-sel-btn.active {
+      background: var(--butter-yellow);
+    }
+    .ingredient-sel-btn.completed {
+      background: var(--mint-soft);
+      border-color: #2D6A4F;
+      color: #2D6A4F;
+    }
+
+    .scale-console {
+      background: #FFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 8px 0 #DEC0A4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .scale-pan {
+      width: 180px;
+      height: 24px;
+      background: linear-gradient(180deg, #E2E8F0 0%, #CBD5E1 100%);
+      border: 2px solid var(--choco-dark);
+      border-radius: 12px 12px 4px 4px;
+      margin-bottom: 4px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .bowl-3d {
+      position: absolute;
+      bottom: 20px;
+      font-size: 55px;
+      transition: transform 0.2s;
+    }
+    .scale-base {
+      width: 220px;
+      background: #F1F5F9;
+      border: 3px solid var(--choco-dark);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+    }
+    .lcd-screen {
+      background: #1B263B;
+      border: 2px solid var(--choco-dark);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #00F5D4;
+      font-family: monospace;
+      font-weight: 900;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(0,245,212,0.6);
+    }
+    .scale-controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      width: 100%;
+      margin: 14px 0;
+    }
+
+    /* Math Challenge Card */
+    .math-card {
+      background: #FFFFFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 20px;
+      padding: 20px;
+      max-width: 560px;
+      margin: auto;
+      box-shadow: 0 8px 0 #DEC0A4;
+      text-align: center;
+    }
+    .math-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .option-btn {
+      padding: 12px;
+      border: 2px solid var(--choco-dark);
+      border-radius: 12px;
+      background: #FFF;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--choco-dark);
+      line-height: 1.3;
+    }
+    .option-btn:hover { background: var(--pink-soft); }
+
+    /* Mixing & Oven */
+    .kitchen-view {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+      height: 100%;
+    }
+    .oven-device {
+      background: #E29578;
+      border: 4px solid var(--choco-dark);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 10px 0 #9E5B42;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .oven-window {
+      width: 85%;
+      height: 160px;
+      background: #3D2619;
+      border: 3px solid var(--choco-dark);
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 60px;
+      overflow: hidden;
+    }
+    .oven-window.glowing {
+      background: radial-gradient(circle, #FF9E00 20%, #E85D04 80%);
+      box-shadow: 0 0 30px #FFB703;
+      animation: pulseHeat 0.8s infinite alternate;
+    }
+    @keyframes pulseHeat {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.2); }
+    }
+    .mixing-station {
+      background: #FFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 20px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 8px 0 #E3C8B0;
+    }
+    .big-bowl {
+      font-size: 75px;
+      margin: 10px 0;
+      display: inline-block;
+    }
+    .stirring {
+      animation: stirAnim 0.4s ease-in-out infinite;
+    }
+    @keyframes stirAnim {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(15deg) scale(1.05); }
+      100% { transform: rotate(0deg); }
+    }
+
+    /* Cake Platter */
+    .decor-container {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 16px;
+      height: 100%;
+    }
+    .cake-platter {
+      background: #FFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 20px;
+      box-shadow: 0 8px 0 #E3C8B0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: relative;
+    }
+    .cake-canvas-wrap {
+      width: 220px;
+      height: 220px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cake-base-sprite {
+      font-size: 110px;
+      position: relative;
+      z-index: 1;
+    }
+    .toppings-layer {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Certificate */
+    .cert-frame {
+      background: #FFFDF7;
+      border: 6px double var(--choco-dark);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 620px;
+      margin: auto;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .stats-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 16px 0;
+      background: #FFF4E6;
+      border: 2px dashed var(--choco-dark);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .toast-popup {
+      position: absolute;
+      top: 65px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #FFF;
+      border: 3px solid var(--choco-dark);
+      border-radius: 14px;
+      padding: 8px 18px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .toast-popup.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast-popup.success { background: var(--mint-soft); color: #1B4332; }
+    .toast-popup.warn { background: #FFE5D9; color: #9D0208; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printable-cert, #printable-cert * { visibility: visible; }
+      #printable-cert {
+        position: fixed;
+        left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .shop-layout, .weigh-station, .kitchen-view, .decor-container {
+        grid-template-columns: 1fr;
+      }
+      .stats-summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-app">
+  <div id="toast-msg" class="toast-popup">Notifikasi</div>
+
+  <header class="hud-bar" id="game-hud" style="display: none;">
+    <div class="player-profile">
+      <div class="chef-avatar">👨‍🍳</div>
+      <div class="player-text">
+        <div class="p-name" id="hud-name">Junior Baker</div>
+        <div class="p-grade" id="hud-grade">Tahun 5 • Kelas 5 Arif</div>
+      </div>
+    </div>
+    <div class="hud-stats">
+      <div class="stat-badge wallet">💰 <span id="hud-wallet">RM20.00</span></div>
+      <div class="stat-badge score">⭐ <span id="hud-score">0</span> Mata</div>
+    </div>
+    <div style="width: 100%;">
+      <div class="progress-box">
+        <div class="progress-fill" id="game-progress-bar"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="stage-viewport">
+    <!-- 0. SCREEN: WELCOME -->
+    <section class="screen active" id="screen-welcome">
+      <div class="welcome-card">
+        <div class="hero-banner">🍰✨</div>
+        <h1 style="color: var(--pink-primary); font-size: 2rem;">Bakery Math Adventure</h1>
+        <h3 style="color: var(--choco-light); margin-bottom: 16px;">Misi Kek Impian • Matematik Jisim</h3>
+        
+        <div class="form-group">
+          <label>📝 Nama Murid:</label>
+          <input type="text" id="input-player-name" class="input-3d" placeholder="Contoh: Adam Rayyan" maxlength="25">
+        </div>
+
+        <div class="form-group">
+          <label>🏫 Kelas:</label>
+          <input type="text" id="input-player-class" class="input-3d" placeholder="Contoh: 5 Arif">
+        </div>
+
+        <div class="form-group">
+          <label>🎯 Tahap:</label>
+          <div class="grade-grid">
+            <button type="button" class="grade-btn" onclick="setYear(4, this)">Tahun 4</button>
+            <button type="button" class="grade-btn active" onclick="setYear(5, this)">Tahun 5</button>
+            <button type="button" class="grade-btn" onclick="setYear(6, this)">Tahun 6</button>
+          </div>
+        </div>
+
+        <button class="btn-3d" style="width: 100%; margin-top: 14px;" onclick="startGame()">🚀 Buka Kedai Bakeri!</button>
+      </div>
+    </section>
+
+    <!-- 1. SCREEN: ORDER -->
+    <section class="screen" id="screen-order">
+      <div class="dialogue-scene">
+        <div class="customer-avatar">👧🌸</div>
+        <div class="bubble-card">
+          <p id="customer-dialogue">"Hai Junior Baker! Saya mahu menempah <strong>Kek Coklat Impian</strong>. Tolong pastikan sukatannya tepat mengikut resipi ya!"</p>
+        </div>
+
+        <div class="recipe-manifest">
+          <h3 style="margin-bottom: 6px;">📋 Resipi Kek Coklat Impian:</h3>
+          <div class="recipe-list-item"><span>🌾 Tepung Gandum</span><span>500 g</span></div>
+          <div class="recipe-list-item"><span>🍬 Gula Pasir</span><span>250 g</span></div>
+          <div class="recipe-list-item"><span>🍫 Serbuk Koko</span><span>100 g</span></div>
+          <div class="recipe-list-item"><span>🧈 Mentega</span><span>250 g</span></div>
+          <div class="recipe-list-item"><span>🍫 Coklat Masakan</span><span>500 g</span></div>
+        </div>
+
+        <button class="btn-3d btn-mint" style="width: 100%; max-width: 380px;" onclick="acceptOrder()">🤝 Terima Tempahan & Beli Bahan</button>
+      </div>
+    </section>
+
+    <!-- 2. SCREEN: SHOP -->
+    <section class="screen" id="screen-shop">
+      <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2>🏪 Kedai Bekalan Bakeri</h2>
+          <p style="font-size: 0.85rem; color: #7F5539;">Pilih bungkusan bahan mengikut keperluan resipi.</p>
+        </div>
+      </div>
+
+      <div class="shop-layout">
+        <div class="items-shelf" id="shop-catalog-shelf"></div>
+        <div class="cart-summary">
+          <h3>🛒 Bakul Belian</h3>
+          <div class="cart-items-box" id="cart-items-list">
+            <p style="color: #999; font-size: 0.85rem; text-align: center; margin-top: 25px;">Troli kosong.</p>
+          </div>
+          <div style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 800;">
+            <div style="display:flex; justify-content:space-between;"><span>Jumlah Kos:</span><span id="cart-total-cost">RM0.00</span></div>
+            <div style="display:flex; justify-content:space-between; color: #2B9348;"><span>Baki Wang:</span><span id="cart-balance-cost">RM20.00</span></div>
+          </div>
+          <button class="btn-3d btn-mint" id="btn-checkout" onclick="checkoutIngredients()">🛍️ Sahkan Belian</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 & 4. SCREEN: WEIGHING SCALE -->
+    <section class="screen" id="screen-weighing">
+      <div style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2>⚖️ Kaunter Penimbang Digital</h2>
+          <p style="font-size: 0.85rem; color: #7F5539;">Sukat setiap bahan menepati sasaran resipi.</p>
+        </div>
+      </div>
+
+      <div class="weigh-station">
+        <div class="recipe-board">
+          <h3 style="margin-bottom: 10px;">🥣 Senarai Bahan</h3>
+          <div id="recipe-prep-list"></div>
+        </div>
+
+        <div class="scale-console">
+          <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: 800;">
+            <span id="active-ingredient-name">Bahan: -</span>
+            <span style="color: #E85D04;" id="target-weight-label">Sasaran: 0 g</span>
+          </div>
+
+          <div class="scale-pan">
+            <div class="bowl-3d" id="bowl-graphic">🥣</div>
+          </div>
+          <div class="scale-base">
+            <div class="lcd-screen">
+              <span id="scale-lcd-val">0</span> <span style="font-size: 1.1rem; color:#70E000;">g</span>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+              <button class="btn-3d btn-sm btn-yellow" onclick="tareScale()">⚙️ Tara (0 g)</button>
+              <button class="btn-3d btn-sm" style="background: #E63946;" onclick="resetCurrentWeigh()">🗑️ Kosongkan</button>
+            </div>
+          </div>
+
+          <div class="scale-controls">
+            <button class="btn-3d btn-sm btn-mint" onclick="addWeight(10)">+10 g</button>
+            <button class="btn-3d btn-sm btn-mint" onclick="addWeight(50)">+50 g</button>
+            <button class="btn-3d btn-sm btn-mint" onclick="addWeight(100)">+100 g</button>
+            <button class="btn-3d btn-sm btn-mint" onclick="addWeight(250)">+250 g</button>
+            <button class="btn-3d btn-sm btn-yellow" onclick="addWeight(-10)">-10 g</button>
+            <button class="btn-3d btn-sm btn-yellow" onclick="addWeight(-50)">-50 g</button>
+            <button class="btn-3d btn-sm btn-yellow" onclick="addWeight(-100)">-100 g</button>
+            <button class="btn-3d btn-sm btn-yellow" onclick="addWeight(-250)">-250 g</button>
+          </div>
+
+          <button class="btn-3d btn-mint" style="width: 100%;" onclick="confirmWeighMeasurement()">✅ Sahkan Sukatan Bahan Ini</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SCREEN: MATH POP QUIZ -->
+    <section class="screen" id="screen-math-challenge">
+      <div class="math-card">
+        <div style="font-size: 45px; margin-bottom: 6px;">🧠📐</div>
+        <h2 style="color: var(--pink-primary); margin-bottom: 4px;" id="quiz-badge-title">Cabaran Matematik Jisim</h2>
+        <p style="font-weight: 700; color: #7F5539; margin-bottom: 12px;" id="quiz-topic-indicator">Topik: Hubungan kg dan g</p>
+
+        <div style="background: var(--bg-cream); border: 2px solid var(--choco-dark); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+          <h3 id="math-question-text" style="font-size: 1.15rem;">Soalan...</h3>
+        </div>
+
+        <div class="math-options-grid" id="math-options-container"></div>
+        <p id="math-explanation-box" style="font-size: 0.9rem; font-weight: 800; min-height: 22px;"></p>
+      </div>
+    </section>
+
+    <!-- 6. SCREEN: MIXING & BAKING -->
+    <section class="screen" id="screen-baking">
+      <div style="margin-bottom: 10px; text-align: center;">
+        <h2>🥣 Mengadun & Membakar Kek</h2>
+        <p style="color: #7F5539; font-size: 0.9rem;">Semua bahan telah lengkap disukat. Sekarang mari bancuh dan bakar kek!</p>
+      </div>
+
+      <div class="kitchen-view">
+        <div class="mixing-station">
+          <h3>Mangkuk Adunan</h3>
+          <div class="big-bowl" id="mixing-bowl-icon">🥣</div>
+          <p id="mix-status-text" style="font-weight: 800; margin-bottom: 12px;">Kacau bahan sehingga sebati.</p>
+          <button class="btn-3d btn-yellow" id="btn-mix-action" onclick="stirMixtureAction()">🥄 Kacau Adunan</button>
+        </div>
+
+        <div class="oven-device">
+          <div style="display:flex; justify-content:space-between; width: 100%; margin-bottom: 8px; color: #FFF; font-weight: 900;">
+            <span>🔥 KETUHAR (180°C)</span>
+            <span id="oven-timer-label">00:00</span>
+          </div>
+          <div class="oven-window" id="oven-view-window">
+            <span id="cake-inside-oven">🥮</span>
+          </div>
+          <div style="margin-top: 12px; width: 100%;">
+            <button class="btn-3d btn-mint" id="btn-bake-action" disabled onclick="startBakingProcess()">🔥 Masukkan Ke Ketuhar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. SCREEN: DECORATION -->
+    <section class="screen" id="screen-decoration">
+      <div style="margin-bottom: 10px;">
+        <h2>🍓 Hias Kek Coklat</h2>
+        <p style="font-size: 0.85rem; color: #7F5539;">Kek siap dibakar! Letakkan topping pilihan sebelum dihantar.</p>
+      </div>
+
+      <div class="decor-container">
+        <div class="cake-platter">
+          <div class="cake-canvas-wrap">
+            <div class="cake-base-sprite">🎂</div>
+            <div class="toppings-layer" id="cake-toppings-layer"></div>
+          </div>
+        </div>
+
+        <div style="background:#FFF; border:3px solid var(--choco-dark); border-radius:18px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <h3 style="margin-bottom: 8px;">Pilih Topping:</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button class="btn-3d btn-sm btn-yellow" onclick="addTopping('🍓 Strawberi')">🍓 Strawberi</button>
+              <button class="btn-3d btn-sm btn-yellow" onclick="addTopping('🍫 Cip Koko')">🍫 Cip Koko</button>
+              <button class="btn-3d btn-sm btn-yellow" onclick="addTopping('🍦 Krim Putar')">🍦 Krim</button>
+              <button class="btn-3d btn-sm btn-yellow" onclick="addTopping('🍒 Ceri')">🍒 Ceri</button>
+            </div>
+          </div>
+          <button class="btn-3d btn-mint" style="width: 100%; margin-top: 14px;" onclick="deliverCakeToCustomer()">🚚 Hantar Kek Selesai</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. SCREEN: RESULTS & CERTIFICATE -->
+    <section class="screen" id="screen-results">
+      <div class="cert-frame" id="printable-cert">
+        <div style="font-size: 45px;">🎖️🍰🏆</div>
+        <h2 style="color: #9C6644; text-transform: uppercase;">Sijil Master Baker Matematik</h2>
+        <p style="font-size: 0.9rem; font-weight: 700; color: #7F5539;">Dianugerahkan kepada:</p>
+        
+        <div style="font-size: 1.8rem; color: var(--pink-primary); margin: 8px 0; font-weight: 800;" id="cert-name">NAMA MURID</div>
+        <p style="font-weight: 800;" id="cert-class">Kelas: 5 Arif</p>
+        
+        <p style="margin: 10px auto; font-size: 0.9rem; line-height: 1.4;">
+          Berjaya menyelesaikan simulasi perniagaan bakeri, menguasai sukatan jisim <strong>kilogram (kg) & gram (g)</strong>, mengendalikan penimbang secara tepat serta membakar kek dengan cemerlang!
+        </p>
+
+        <div class="stats-summary-grid">
+          <div><h4>SKOR</h4><p id="cert-score" style="font-weight:900; font-size:1.2rem;">0</p></div>
+          <div><h4>TEPAT</h4><p id="cert-accuracy" style="font-weight:900; font-size:1.2rem;">100%</p></div>
+          <div><h4>KUIZ</h4><p id="cert-math-score" style="font-weight:900; font-size:1.2rem;">0/0</p></div>
+          <div><h4>GELARAN</h4><p id="cert-rank" style="font-weight:900; font-size:0.95rem; color:#D90429;">Master Baker</p></div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:center; gap: 10px; margin-top: 16px;">
+        <button class="btn-3d btn-yellow" onclick="window.print()">🖨️ Cetak Sijil</button>
+        <button class="btn-3d btn-mint" onclick="restartEntireGame()">🔄 Main Semula</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  /* Audio Synthesizer */
+  class SoundFX {
+    constructor() { this.ctx = null; }
+    init() {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    }
+    tone(freq, dur = 0.12) {
+      try {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + dur);
+      } catch(e) {}
+    }
+    click() { this.tone(480, 0.08); }
+    correct() { this.tone(523, 0.1); setTimeout(() => this.tone(659, 0.15), 90); }
+    wrong() { this.tone(200, 0.2); }
+    fanfare() {
+      [261, 329, 392, 523, 659].forEach((f, i) => setTimeout(() => this.tone(f, 0.18), i * 100));
+    }
+  }
+  const sfx = new SoundFX();
+
+  /* State */
+  const GAME_STATE = {
+    playerName: '',
+    playerClass: '',
+    playerYear: 5,
+    wallet: 20.00,
+    score: 0,
+    mathCorrectCount: 0,
+    mathTotalAsked: 0,
+    
+    recipe: [
+      { id: 'flour', name: 'Tepung Gandum', icon: '🌾', reqGrams: 500, state: 'pending' },
+      { id: 'sugar', name: 'Gula Pasir', icon: '🍬', reqGrams: 250, state: 'pending' },
+      { id: 'cocoa', name: 'Serbuk Koko', icon: '🍫', reqGrams: 100, state: 'pending' },
+      { id: 'butter', name: 'Mentega', icon: '🧈', reqGrams: 250, state: 'pending' },
+      { id: 'choc', name: 'Coklat Masakan', icon: '🍫', reqGrams: 500, state: 'pending' }
+    ],
+
+    shopCatalog: [
+      { id: 'flour_1kg', name: 'Tepung Gandum', icon: '🌾', unitMass: '1 kg (1,000 g)', grams: 1000, price: 4.00, targetId: 'flour' },
+      { id: 'sugar_500g', name: 'Gula Pasir', icon: '🍬', unitMass: '500 g', grams: 500, price: 2.50, targetId: 'sugar' },
+      { id: 'cocoa_250g', name: 'Serbuk Koko', icon: '🍫', unitMass: '250 g', grams: 250, price: 5.00, targetId: 'cocoa' },
+      { id: 'butter_250g', name: 'Mentega', icon: '🧈', unitMass: '250 g', grams: 250, price: 4.50, targetId: 'butter' },
+      { id: 'choc_500g', name: 'Coklat Masakan', icon: '🍫', unitMass: '500 g', grams: 500, price: 4.00, targetId: 'choc' }
+    ],
+
+    cart: [],
+    activeWeighIndex: 0,
+    currentScaleGrams: 0,
+
+    /* BANK SOALAN KUIZ BERPERINGKAT (TAHAP 2) */
+    mathQuestions: [
+      {
+        topic: "Penukaran Asas Unit (kg ke g)",
+        q: "Sebungkus tepung mempunyai jisim 1 kg. Berapakah jisimnya dalam unit gram?",
+        options: ["100 g", "1,000 g", "10,000 g", "10 g"],
+        correct: 1,
+        explain: "1 kg sentiasa bersamaan dengan 1,000 g."
+      },
+      {
+        topic: "Penambahan Jisim Asas",
+        q: "Tepung 500 g dicampurkan dengan gula 250 g. Berapakah jumlah jisim adunan ini?",
+        options: ["650 g", "700 g", "750 g", "1,000 g"],
+        correct: 2,
+        explain: "500 g + 250 g = 750 g."
+      },
+      {
+        topic: "Penolakan Jisim Bahan",
+        q: "Bungkusan koko ada 250 g. Jika kamu guna 100 g, berapa gramkah baki koko?",
+        options: ["150 g", "100 g", "50 g", "200 g"],
+        correct: 0,
+        explain: "250 g - 100 g = 150 g."
+      },
+      {
+        topic: "Penukaran Unit Campuran",
+        q: "Jisim seketul kek mentega ialah 2,450 g. Nyatakan jisim ini dalam kg dan g.",
+        options: ["24 kg 50 g", "2 kg 45 g", "2 kg 450 g", "245 kg"],
+        correct: 2,
+        explain: "2,000 g = 2 kg. Maka 2,450 g = 2 kg 450 g."
+      },
+      {
+        topic: "Pecahan Jisim (Tahun 5)",
+        q: "Resipi memerlukan 1/2 kg mentega. Berapakah nilai 1/2 kg dalam gram?",
+        options: ["250 g", "500 g", "750 g", "100 g"],
+        correct: 1,
+        explain: "1/2 × 1,000 g = 500 g."
+      },
+      {
+        topic: "Perpuluhan Jisim (Tahun 5 & 6)",
+        q: "Sebiji kek coklat besar mempunyai jisim 1.75 kg. Tukarkan jisim tersebut kepada gram.",
+        options: ["175 g", "1,075 g", "1,750 g", "17,500 g"],
+        correct: 2,
+        explain: "Darab dengan 1,000: 1.75 × 1,000 = 1,750 g."
+      },
+      {
+        topic: "Penyelesaian Masalah Harian",
+        q: "Cef ada 1 kg coklat. Dia gunakan 350 g untuk adunan dan 200 g untuk hiasan. Berapakah baki coklat yang tinggal?",
+        options: ["450 g", "550 g", "350 g", "650 g"],
+        correct: 0,
+        explain: "Jumlah guna: 350 g + 200 g = 550 g. Baki: 1,000 g - 550 g = 450 g."
+      },
+      {
+        topic: "Operasi Darab Jisim",
+        q: "Jika 1 biji mufin memerlukan 80 g tepung, berapakah jumlah jisim tepung untuk 5 biji mufin yang sama?",
+        options: ["350 g", "400 g", "450 g", "500 g"],
+        correct: 1,
+        explain: "80 g × 5 = 400 g."
+      }
+    ],
+    currentQuizIndex: 0,
+    onQuizSuccessCallback: null,
+
+    stirCount: 0,
+    toppings: []
+  };
+
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateHUD() {
+    document.getElementById('hud-name').innerText = GAME_STATE.playerName || 'Junior Baker';
+    document.getElementById('hud-grade').innerText = `Tahun ${GAME_STATE.playerYear} • ${GAME_STATE.playerClass}`;
+    document.getElementById('hud-wallet').innerText = `RM${GAME_STATE.wallet.toFixed(2)}`;
+    document.getElementById('hud-score').innerText = GAME_STATE.score;
+  }
+
+  function setProgressBar(percent) {
+    document.getElementById('game-progress-bar').style.width = `${percent}%`;
+  }
+
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast-msg');
+    toast.innerText = msg;
+    toast.className = `toast-popup visible ${type}`;
+    setTimeout(() => toast.classList.remove('visible'), 2800);
+  }
+
+  function setYear(yr, btn) {
+    sfx.click();
+    GAME_STATE.playerYear = yr;
+    document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  /* 0. START */
+  function startGame() {
+    sfx.click();
+    const name = document.getElementById('input-player-name').value.trim();
+    const cls = document.getElementById('input-player-class').value.trim();
+
+    if (!name) return showToast('Sila masukkan Nama Murid!', 'warn');
+    if (!cls) return showToast('Sila masukkan Kelas Murid!', 'warn');
+
+    GAME_STATE.playerName = name;
+    GAME_STATE.playerClass = cls;
+
+    document.getElementById('game-hud').style.display = 'flex';
+    updateHUD();
+    setProgressBar(12);
+
+    document.getElementById('customer-dialogue').innerHTML = 
+      `"Selamat datang Cef <strong>${GAME_STATE.playerName}</strong>! Tolong sediakan Kek Coklat Impian mengikut sukatan resipi ya!"`;
+
+    showScreen('screen-order');
+  }
+
+  /* 1. ORDER */
+  function acceptOrder() {
+    sfx.click();
+    setProgressBar(25);
+    renderShopCatalog();
+    showScreen('screen-shop');
+  }
+
+  /* 2. SHOP */
+  function renderShopCatalog() {
+    const shelf = document.getElementById('shop-catalog-shelf');
+    shelf.innerHTML = '';
+
+    GAME_STATE.shopCatalog.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'shop-item-card';
+      card.innerHTML = `
+        <div>
+          <div class="item-icon-wrap">${item.icon}</div>
+          <h4 style="font-size:0.95rem;">${item.name}</h4>
+          <p style="font-size:0.8rem; color:#7F5539;">Jisim: ${item.unitMass}</p>
+          <p style="color:#2B9348; font-weight:900;">RM${item.price.toFixed(2)}</p>
+        </div>
+        <button class="btn-3d btn-sm btn-yellow" style="margin-top:8px;" onclick="addToCart('${item.id}')">🛒 Tambah</button>
+      `;
+      shelf.appendChild(card);
+    });
+    updateCartUI();
+  }
+
+  function addToCart(id) {
+    const item = GAME_STATE.shopCatalog.find(i => i.id === id);
+    const cost = GAME_STATE.cart.reduce((sum, i) => sum + i.price, 0);
+    if (cost + item.price > GAME_STATE.wallet) {
+      sfx.wrong();
+      return showToast('Bajet tidak mencukupi!', 'warn');
+    }
+    sfx.click();
+    GAME_STATE.cart.push(item);
+    updateCartUI();
+  }
+
+  function removeFromCart(idx) {
+    sfx.click();
+    GAME_STATE.cart.splice(idx, 1);
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const list = document.getElementById('cart-items-list');
+    const totEl = document.getElementById('cart-total-cost');
+    const balEl = document.getElementById('cart-balance-cost');
+
+    if (GAME_STATE.cart.length === 0) {
+      list.innerHTML = '<p style="color: #999; font-size: 0.85rem; text-align: center; margin-top: 25px;">Troli kosong.</p>';
+      totEl.innerText = 'RM0.00';
+      balEl.innerText = `RM${GAME_STATE.wallet.toFixed(2)}`;
+      return;
+    }
+
+    list.innerHTML = '';
+    let total = 0;
+    GAME_STATE.cart.forEach((it, idx) => {
+      total += it.price;
+      const d = document.createElement('div');
+      d.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.85rem; font-weight:700;';
+      d.innerHTML = `<span>${it.name}</span><div><span>RM${it.price.toFixed(2)}</span><button style="border:none; background:none; color:red; cursor:pointer; margin-left:5px;" onclick="removeFromCart(${idx})">✖</button></div>`;
+      list.appendChild(d);
+    });
+
+    totEl.innerText = `RM${total.toFixed(2)}`;
+    balEl.innerText = `RM${(GAME_STATE.wallet - total).toFixed(2)}`;
+  }
+
+  function checkoutIngredients() {
+    const boughtIds = GAME_STATE.cart.map(c => c.targetId);
+    const required = ['flour', 'sugar', 'cocoa', 'butter', 'choc'];
+    const missing = required.filter(r => !boughtIds.includes(r));
+
+    if (missing.length > 0) {
+      sfx.wrong();
+      return showToast('Sila beli semua 5 bahan utama resipi!', 'warn');
+    }
+
+    const total = GAME_STATE.cart.reduce((s, i) => s + i.price, 0);
+    GAME_STATE.wallet -= total;
+    GAME_STATE.score += 20;
+    updateHUD();
+    sfx.correct();
+    showToast('Bahan berjaya dibeli! (+20 Mata)');
+
+    // Kuiz 1: Selepas Belian
+    triggerMathChallenge(0, () => {
+      setProgressBar(40);
+      initWeighingScreen();
+      showScreen('screen-weighing');
+    });
+  }
+
+  /* 3. WEIGHING */
+  function initWeighingScreen() {
+    renderRecipeChecklist();
+    selectIngredientToWeigh(0);
+  }
+
+  function renderRecipeChecklist() {
+    const list = document.getElementById('recipe-prep-list');
+    list.innerHTML = '';
+
+    GAME_STATE.recipe.forEach((item, index) => {
+      const btn = document.createElement('div');
+      const isDone = item.state === 'completed';
+      const isActive = GAME_STATE.activeWeighIndex === index;
+
+      btn.className = `ingredient-sel-btn ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}`;
+      btn.innerHTML = `<span>${item.icon} ${item.name}</span><span>${isDone ? '✅ Selesai' : item.reqGrams + ' g'}</span>`;
+      btn.onclick = () => {
+        if (!isDone) {
+          sfx.click();
+          selectIngredientToWeigh(index);
+        }
+      };
+      list.appendChild(btn);
+    });
+  }
+
+  function selectIngredientToWeigh(idx) {
+    GAME_STATE.activeWeighIndex = idx;
+    GAME_STATE.currentScaleGrams = 0;
+    const ing = GAME_STATE.recipe[idx];
+    document.getElementById('active-ingredient-name').innerText = `Bahan: ${ing.name}`;
+    document.getElementById('target-weight-label').innerText = `Sasaran: ${ing.reqGrams} g`;
+    document.getElementById('scale-lcd-val').innerText = '0';
+    renderRecipeChecklist();
+  }
+
+  function addWeight(amt) {
+    sfx.click();
+    const val = GAME_STATE.currentScaleGrams + amt;
+    GAME_STATE.currentScaleGrams = val < 0 ? 0 : val;
+    document.getElementById('scale-lcd-val').innerText = GAME_STATE.currentScaleGrams;
+    document.getElementById('bowl-graphic').style.transform = `scale(${1 + GAME_STATE.currentScaleGrams / 3000})`;
+  }
+
+  function resetCurrentWeigh() {
+    sfx.click();
+    GAME_STATE.currentScaleGrams = 0;
+    document.getElementById('scale-lcd-val').innerText = '0';
+  }
+
+  function tareScale() {
+    sfx.click();
+    GAME_STATE.currentScaleGrams = 0;
+    document.getElementById('scale-lcd-val').innerText = '0';
+    showToast('Penimbang ditara kepada 0 g');
+  }
+
+  function confirmWeighMeasurement() {
+    const ing = GAME_STATE.recipe[GAME_STATE.activeWeighIndex];
+    const diff = GAME_STATE.currentScaleGrams - ing.reqGrams;
+
+    if (diff === 0) {
+      sfx.correct();
+      ing.state = 'completed';
+      GAME_STATE.score += 20;
+      updateHUD();
+      showToast(`Sukatan ${ing.name} tepat! (+20 Mata)`);
+
+      const finishedCount = GAME_STATE.recipe.filter(r => r.state === 'completed').length;
+      const nextPending = GAME_STATE.recipe.findIndex(i => i.state === 'pending');
+
+      // Selitkan Kuiz Tambahan semasa proses menyukat bahan
+      if (finishedCount === 2) {
+        // Kuiz 2: Penambahan Jisim Asas
+        triggerMathChallenge(1, () => {
+          showScreen('screen-weighing');
+          if (nextPending !== -1) selectIngredientToWeigh(nextPending);
+        });
+        return;
+      } else if (finishedCount === 4) {
+        // Kuiz 3: Pecahan Jisim (1/2 kg)
+        triggerMathChallenge(4, () => {
+          showScreen('screen-weighing');
+          if (nextPending !== -1) selectIngredientToWeigh(nextPending);
+        });
+        return;
+      }
+
+      if (nextPending !== -1) {
+        selectIngredientToWeigh(nextPending);
+      } else {
+        // Semua 5 bahan selesai
+        setProgressBar(75);
+        showToast('Semua bahan telah lengkap disukat!');
+        
+        // Kuiz 4: Penolakan Jisim sebelum masuk membancuh
+        setTimeout(() => {
+          triggerMathChallenge(2, () => {
+            showScreen('screen-baking');
+          });
+        }, 800);
+      }
+    } else if (diff < 0) {
+      sfx.wrong();
+      showToast(`Masih kurang ${Math.abs(diff)} g!`, 'warn');
+    } else {
+      sfx.wrong();
+      showToast(`Terlebih ${diff} g! Sila kurangkan bahan.`, 'warn');
+    }
+    renderRecipeChecklist();
+  }
+
+  /* 4. MATH QUIZ SYSTEM */
+  function triggerMathChallenge(qIdx, onDone) {
+    GAME_STATE.currentQuizIndex = qIdx;
+    GAME_STATE.onQuizSuccessCallback = onDone;
+
+    const data = GAME_STATE.mathQuestions[qIdx];
+    document.getElementById('quiz-topic-indicator').innerText = `Topik: ${data.topic}`;
+    document.getElementById('math-question-text').innerText = data.q;
+    document.getElementById('math-explanation-box').innerText = '';
+
+    const box = document.getElementById('math-options-container');
+    box.innerHTML = '';
+
+    data.options.forEach((txt, i) => {
+      const b = document.createElement('button');
+      b.className = 'option-btn';
+      b.innerText = txt;
+      b.disabled = false;
+      b.onclick = () => answerMathQuiz(i);
+      box.appendChild(b);
+    });
+
+    showScreen('screen-math-challenge');
+  }
+
+  function answerMathQuiz(selected) {
+    const data = GAME_STATE.mathQuestions[GAME_STATE.currentQuizIndex];
+    const exp = document.getElementById('math-explanation-box');
+    GAME_STATE.mathTotalAsked++;
+
+    if (selected === data.correct) {
+      sfx.correct();
+      GAME_STATE.score += 10;
+      GAME_STATE.mathCorrectCount++;
+      updateHUD();
+      exp.style.color = '#2D6A4F';
+      exp.innerText = `Jawapan Tepat! 🌟 ${data.explain} (+10 Mata)`;
+
+      document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+      setTimeout(() => {
+        if (typeof GAME_STATE.onQuizSuccessCallback === 'function') {
+          GAME_STATE.onQuizSuccessCallback();
+        }
+      }, 1300);
+    } else {
+      sfx.wrong();
+      exp.style.color = '#D90429';
+      exp.innerText = 'Kurang tepat. Cuba fikirkan semula dan pilih lagi!';
+    }
+  }
+
+  /* 5. MIXING & BAKING */
+  function stirMixtureAction() {
+    sfx.click();
+    GAME_STATE.stirCount++;
+    const bowl = document.getElementById('mixing-bowl-icon');
+    bowl.classList.add('stirring');
+
+    const status = document.getElementById('mix-status-text');
+    if (GAME_STATE.stirCount === 1) {
+      status.innerText = 'Mengadun tepung, gula dan koko...';
+    } else if (GAME_STATE.stirCount >= 2) {
+      status.innerText = 'Adunan licin dan sebati! Sedia untuk dibakar.';
+      document.getElementById('btn-mix-action').disabled = true;
+      document.getElementById('btn-bake-action').disabled = false;
+      document.getElementById('cake-inside-oven').innerText = '🥣';
+    }
+
+    setTimeout(() => bowl.classList.remove('stirring'), 500);
+  }
+
+  function startBakingProcess() {
+    sfx.click();
+    document.getElementById('btn-bake-action').disabled = true;
+    const win = document.getElementById('oven-view-window');
+    const timer = document.getElementById('oven-timer-label');
+    win.classList.add('glowing');
+
+    let count = 3;
+    const interval = setInterval(() => {
+      timer.innerText = `00:0${count}`;
+      sfx.tone(450, 0.1);
+      count--;
+
+      if (count < 0) {
+        clearInterval(interval);
+        timer.innerText = 'SIAP! 🔔';
+        win.classList.remove('glowing');
+        document.getElementById('cake-inside-oven').innerText = '🎂';
+        sfx.fanfare();
+        GAME_STATE.score += 50;
+        updateHUD();
+        setProgressBar(90);
+        showToast('Kek coklat siap dibakar gebu! (+50 Mata)');
+
+        // Kuiz 5: Perpuluhan / Unit Campuran sebelum menghias kek
+        setTimeout(() => {
+          triggerMathChallenge(5, () => {
+            showScreen('screen-decoration');
+          });
+        }, 1200);
+      }
+    }, 1000);
+  }
+
+  /* 6. DECORATION & DELIVERY */
+  function addTopping(name) {
+    sfx.click();
+    GAME_STATE.toppings.push(name);
+
+    const layer = document.getElementById('cake-toppings-layer');
+    const sp = document.createElement('span');
+    sp.style.position = 'absolute';
+    sp.style.fontSize = '28px';
+    sp.style.left = `${25 + Math.random() * 50}%`;
+    sp.style.top = `${25 + Math.random() * 40}%`;
+    sp.innerText = name.slice(0, 2);
+    layer.appendChild(sp);
+
+    showToast(`Ditambah: ${name}`);
+  }
+
+  function deliverCakeToCustomer() {
+    sfx.click();
+    // Kuiz 6 (Cabaran Terakhir): Masalah Harian Jisim sebelum cetak sijil
+    triggerMathChallenge(6, () => {
+      finishOrderAndAward();
+    });
+  }
+
+  function finishOrderAndAward() {
+    sfx.fanfare();
+    setProgressBar(100);
+
+    document.getElementById('cert-name').innerText = GAME_STATE.playerName.toUpperCase();
+    document.getElementById('cert-class').innerText = `Kelas: ${GAME_STATE.playerClass} • Tahun ${GAME_STATE.playerYear}`;
+    document.getElementById('cert-score').innerText = GAME_STATE.score;
+
+    const acc = GAME_STATE.mathTotalAsked > 0 
+      ? Math.round((GAME_STATE.mathCorrectCount / GAME_STATE.mathTotalAsked) * 100) 
+      : 100;
+    
+    document.getElementById('cert-accuracy').innerText = `${acc}%`;
+    document.getElementById('cert-math-score').innerText = `${GAME_STATE.mathCorrectCount}/${GAME_STATE.mathTotalAsked}`;
+
+    let rank = 'Baker Pelatih';
+    if (GAME_STATE.score >= 210) rank = 'Master Baker Matematik 👑';
+    else if (GAME_STATE.score >= 160) rank = 'Junior Baker Hebat ⭐';
+    else if (GAME_STATE.score >= 100) rank = 'Baker Muda 🧁';
+
+    document.getElementById('cert-rank').innerText = rank;
+    showScreen('screen-results');
+  }
+
+  function restartEntireGame() {
+    sfx.click();
+    GAME_STATE.wallet = 20.00;
+    GAME_STATE.score = 0;
+    GAME_STATE.mathCorrectCount = 0;
+    GAME_STATE.mathTotalAsked = 0;
+    GAME_STATE.cart = [];
+    GAME_STATE.stirCount = 0;
+    GAME_STATE.toppings = [];
+    GAME_STATE.recipe.forEach(r => r.state = 'pending');
+
+    document.getElementById('game-hud').style.display = 'none';
+    document.getElementById('cake-toppings-layer').innerHTML = '';
+    document.getElementById('btn-mix-action').disabled = false;
+    document.getElementById('btn-bake-action').disabled = true;
+
+    showScreen('screen-welcome');
+  }
+</script>
+</body>
+</html>
